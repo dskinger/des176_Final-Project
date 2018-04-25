@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link REL="STYLESHEET" TYPE="text/css" HREF="spotify.css">
+<meta charset="ISO-8859-1">
+<title>Spotify Knockoff</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+
+<script>   
+var searchResult = null;
+$(document).ready(function(){
+	
+	$("#btnSearch").click(function(){
+		var searchTerm = $("#txtSearch").val();
+		var selValue = $('input[name=list]:checked').val(); 
+        $('footer').html('<br/>Selected Radio Button Value is : <b>' + selValue + '</b>');
+		search(searchTerm,selValue);
+	});
+});
+
+$(document).ready(function(){
+
+	$("#txtSearch").keyup(function(){
+		var searchTerm = $("#txtSearch").val();
+		if(searchTerm.length >= 3){
+			var selValue = $('input[name=list]:checked').val(); 
+	        $('footer').html('<br/>Selected Radio Button Value is : <b>' + selValue + '</b>');
+			console.log(searchTerm);
+			search(searchTerm,selValue);
+		}
+	});
+});
+
+function search(searchTerm, selValue){
+	if (selValue == 'song'){
+		var searchUrl = "api/get_songs?songs=" + searchTerm;
+	}
+	else if (selValue == 'artist'){
+		var searchUrl = "api/get_songs?artists=" + searchTerm;
+	}
+	else if (selValue == 'album'){
+		var searchUrl = "api/get_songs?albums=" + searchTerm;
+	}
+	console.log(searchUrl);
+	$.get(searchUrl, function(data){
+		 console.log(data);
+//		 var viewModel = {};
+	//	 viewModel.songData = data;
+		if (selValue == 'song'){
+			songSearchResults(data);
+		}
+		else if (selValue == 'artist'){
+			artistSearchResults(data);
+		}
+		else if (selValue == 'album'){
+			albumSearchResults(data);
+		}
+	});
+}
+
+function songSearchResults(data){
+	console.log(data.songs);
+	var tbldata = $('#tblData').find("tbody")[0]; 
+	ko.cleanNode(tbldata);
+	ko.applyBindings(data, tbldata);
+}
+
+function albumSearchResults(data){
+	console.log(data.albums);
+	var tbldata = $('#tblData').find("tbody")[0]; 
+	ko.cleanNode(tbldata);
+	ko.applyBindings(data, tbldata);
+}
+
+function artistSearchResults(data){
+	console.log(data.artists);
+	var tbldata = $('#tblData').find("tbody")[0]; 
+	ko.cleanNode(tbldata);
+	ko.applyBindings(data, tbldata);
+}
+
+function songList(){
+	self = this;
+}
+
+function albumList(){
+	self = this;
+}
+
+function artistList(){
+	self = this;
+}
+</script>
+
+
+</head>
+<body>
+<div class="container">
+<header>
+   <h1>Spotify Knockoff</h1>
+</header>
+<nav>
+	<form id="radSearchBy"><br>
+  		<input type="radio" name="list" value="song" checked> Song<br>
+  		<input type="radio" name="list" value="artist"> Artist<br>
+  		<input type="radio" name="list" value="album"> Album<br>
+  	</form>
+  	<form id="userInput">
+  		<input type="text" id="txtSearch" name="txtSearch"><br>
+  		<input type="button" id="btnSearch" value="Search">
+  		<input type="reset" value="Clear">
+	</form>
+</nav>
+<article>
+  <h1>Search Tool</h1>
+
+<table id="tblData" border="1">
+	<thead>
+		<tr>
+	        <th>Title</th><th>Length</th><th>Release Date</th><th>Record Date</th>
+	    </tr>		
+    </thead>
+    <tbody data-bind="foreach: songs">
+	    <tr>
+	        <td data-bind="text: title"></td>
+	        <td data-bind="text: length"></td>
+	        <td data-bind="text: release_date"></td>
+	        <td data-bind="text: record_date"></td>
+	    </tr> 
+    </tbody>
+</table>
+</article>
+<footer>Copyright &copy; Spotify Knockoff</footer>
+</div>
+</body>
+</html>
